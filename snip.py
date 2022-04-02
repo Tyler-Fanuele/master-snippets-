@@ -20,7 +20,7 @@ def help():
     print("snip.py init => used at the start, initilizes snip files/dir")
     print("snip.py edit [editor] => allows editing of the snippits.txt file")
     print("snip.py [snip name] => if the snippit exists in your file, copy to keyboard")
-    print("snip.py ret => Puts the previus clipboard buffer back into your clipboard")
+    print("snip.py ret => Puts the previous clipboard buffer back into your clipboard")
 
 def main():
     # print snippy

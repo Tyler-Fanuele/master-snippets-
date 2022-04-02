@@ -23,7 +23,7 @@ A snip is a refrence to a code snippit. It will be used in the options. save.txt
 | snip.py edit [ editor ] | Allows your to edit your snips file easier. Use your favorite editor. |
 | snip.py help | Prints the help screne to the console. |
 | snip.py init | Creates the config folder and file if they are not created. |
-| snip.py ret | Puts the previus clipboard buffer back into your clipboard |
+| snip.py ret | Puts the previous clipboard buffer back into your clipboard |
 
 ## The snippets.txt file
 
