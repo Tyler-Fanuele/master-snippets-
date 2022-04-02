@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 from os.path import exists
 
+# help function
 def help():
     print("snip.py help:")
     print("snip.py help => outputs this help menu")
@@ -18,8 +19,15 @@ def help():
     print("snip.py [snip name] => if the snippit exists in your file, copy to keyboard")
 
 def main():
-    print("Snippits program\n> by Tyler Fanuele.\n")
-    #print("echo " + '"alias snip=' + "'./snippits.py'" +'"' + ">> ~/.bashrc")
+    # print snippy
+    print("             ____\n"+
+          "            / . .\\\n"+
+          "   snippy   \  ---<\n"+
+          "             \  /\n"
+          "   __________/ /\n"
+          "-=:___________/")
+
+    print("Code Snippets program\n> by Tyler Fanuele.\n")
     # Start of program. Defines home dir and wanted snip
     home = str(Path.home())
     if len(sys.argv) - 1  < 1:
@@ -37,17 +45,17 @@ def main():
     if wanted == "init":
         # if snippits dir exists
         print("Starting start up script")
-        if not exists(home + "/.config/snippits"):
-            print("=> Making dir: " + home + "/.config/snippits")
-            os.system("mkdir " + home + "/.config/snippits")
+        if not exists(home + "/.config/snippets"):
+            print("=> Making dir: " + home + "/.config/snippets")
+            os.system("mkdir " + home + "/.config/snippets")
         else:
-            print("=> snippits directory exists so did nothing...")
+            print("=> snippets directory exists so did nothing...")
         # if snippits.txt exists
-        if not exists(home + "/.config/snippits/snippits.txt"):
-            print("=> Making file: " + home + "/.config/snippits/snippits.txt")
-            os.system("touch " + home + "/.config/snippits/snippits.txt")
+        if not exists(home + "/.config/snippets/snippets.txt"):
+            print("=> Making file: " + home + "/.config/snippets/snippets.txt")
+            os.system("touch " + home + "/.config/snippets/snippets.txt")
         else:
-            print("=> snippits.txt file exists so did nothing...")
+            print("=> snippets.txt file exists so did nothing...")
         print("\nSetup script finished, closing program!")
         return
     
@@ -56,16 +64,16 @@ def main():
         if len(sys.argv) - 1 < 2:
             print("Not enough args!")
             return
-        if not exists(home + "/.config/snippits") or not exists(home + "/.config/snippits/snippits.txt"):
-            print("Snippit dir or snippit.txst file does not exist.\nRun snippit init")
+        if not exists(home + "/.config/snippets") or not exists(home + "/.config/snippets/snippets.txt"):
+            print("Snippit dir or snippet.txst file does not exist.\nRun snippet init")
             return
         print("Attempting to open " + sys.argv[2] + "...\n")
-        os.system(sys.argv[2] + " " + home + "/.config/snippits/snippits.txt")
+        os.system(sys.argv[2] + " " + home + "/.config/snippets/snippets.txt")
         print("Closing Program!")
         return
 
     
-    home += "/.config/snippits/snippits.txt"
+    home += "/.config/snippets/snippets.txt"
     fp = open(home, "r")
     # init snip dict
     dict = defaultdict(list)
@@ -87,7 +95,8 @@ def main():
         print("Printing your snip list:")
         for string in dict:
             print("=> " + string)
-    if wanted == "report":
+    # Report sequence. Will end program after if statement
+    elif wanted == "report":
         print("Reporting your snips:\n")
         for string in dict:
             print("=> " + string)
@@ -103,10 +112,11 @@ def main():
             print("That snip does not seem to exist... ")
             print("Closing program!")
             return
-        print("Looking for snippit: " + wanted)
+        print("Looking for snippet: " + wanted)
         for string in dict[wanted]:
             return_string += string
             pyperclip.copy(return_string)
         print("Snip should be in your clipboard")
+    print("Closing program!")
     fp.close()
 main()
