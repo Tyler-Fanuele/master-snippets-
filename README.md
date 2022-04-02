@@ -24,4 +24,28 @@ A snip is a refrence to a code snippit. It will be used in the options.
 | snip.py help | Prints the help screne to the console. |
 | snip.py init | Creates the config folder and file if they are not created. |
 
-## How to format the snippets.txt file
+## The snippets.txt file
+
+### How To
+
+There are two parts of a snippets.txt file; the name and contents of the snip.\
+
+The name is defined with when a string is surrounded by brackets. THe contents\
+are defined by everything in between the brackets that define its name and the\
+next snips brackets or the end of the file.
+
+### Example
+
+\
+\[ssh]\
+ssh  -X example ex.ex.com\
+\[main]\
+int main() {\
+    printf();\
+    \
+}
+
+### How to continued
+
+In the above example notice how there is a blank line  in the function, this will be copied so\
+be mindful of whitespaces.
