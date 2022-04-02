@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# Copyright 2022 Tyler Fanuele
+
 from genericpath import exists
 import re
 import sys
@@ -17,6 +20,7 @@ def help():
     print("snip.py init => used at the start, initilizes snip files/dir")
     print("snip.py edit [editor] => allows editing of the snippits.txt file")
     print("snip.py [snip name] => if the snippit exists in your file, copy to keyboard")
+    print("snip.py ret => Puts the previus clipboard buffer back into your clipboard")
 
 def main():
     # print snippy
@@ -40,6 +44,15 @@ def main():
     if wanted == "help" or wanted == "h":
         help()
         return
+    
+    if wanted == "ret":
+        sp = open(home + "/.config/snippets/save.txt", "r")
+        ret = ""
+        for line in sp:
+            ret += line
+        pyperclip.copy(ret)
+        sp.close()
+        return
 
     # Init Sequence. Always ends program
     if wanted == "init":
@@ -56,6 +69,11 @@ def main():
             os.system("touch " + home + "/.config/snippets/snippets.txt")
         else:
             print("=> snippets.txt file exists so did nothing...")
+        if not exists(home + "/.config/snippets/save.txt"):
+            print("=> Making file: " + home + "/.config/snippets/save.txt")
+            os.system("touch " + home + "/.config/snippets/save.txt")
+        else:
+            print("=> save.txt file exists so did nothing...")
         print("\nSetup script finished, closing program!")
         return
     
@@ -73,8 +91,8 @@ def main():
         return
 
     
-    home += "/.config/snippets/snippets.txt"
-    fp = open(home, "r")
+    
+    fp = open(home + "/.config/snippets/snippets.txt", "r")
     # init snip dict
     dict = defaultdict(list)
     # init working string for lines parsing
@@ -115,6 +133,10 @@ def main():
         print("Looking for snippet: " + wanted)
         for string in dict[wanted]:
             return_string += string
+            sp = open(home + "/.config/snippets/save.txt", "w") # save clipboard
+            save_string = pyperclip.paste()
+            sp.write(save_string)
+            sp.close()
             pyperclip.copy(return_string)
         print("Snip should be in your clipboard")
     print("Closing program!")
