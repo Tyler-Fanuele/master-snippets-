@@ -10,8 +10,8 @@ by storing your snippets in a user accesable text file.
 ## How to get started
 
 Add the directory to the path and make snip.py exicutable with chmod +x snip.py.
-Then run snip.py init to create your config folder and file and run snip.py edit vim to add snips.
-A snip is a refrence to a code snippit. It will be used in the options.
+Then run snip.py init to create your config folder, snippets.txt file and save.txt file and run snip.py edit vim to add snips.
+A snip is a refrence to a code snippit. It will be used in the options. save.txt is used to save your last clipboard buffer.
 
 ## Options
 
