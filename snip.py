@@ -69,21 +69,23 @@ def help():
 
 def main():
     # print snippy
-    print(add_color("===             ____\n"+
-          "===            / . .\\\n"+
-          "===   snippy   \  ---<\n"+
-          "===             \  /\n"
-          "===   __________/ /\n"
-          "===-=:___________/", G, REG))
-    print(add_color("=== Code Snippets program\n===> by Tyler Fanuele.", G, REG))
-    print(add_color("=== Command issued by user: \n=== ", G, REG), end='')
+    print(add_color(
+          "===               ____\n"+
+          "===              / . .\\\n"+
+          "===    snippy    \  ---<\n"+
+          "===               \  /\n"
+          "===     __________/ /\n"
+          "===  -=:___________/\n===", G, REG))
+    print(add_color("=== Code Snippets program\n=== ", G, REG) + add_color("Copyright 2022, Tyler Fanuele.", G, UND))
+    print(add_color("===\n=== Command issued by user: \n=== ", G, REG), end='')
     for x in sys.argv:
         print(add_color(x, B, REG) + " ", end='')
     print(add_color("\n===", G, REG))
     # Start of program. Defines home dir and wanted snip
     home = str(Path.home())
     if len(sys.argv) - 1  < 1:
-        print("=== Not enough arguments passed")
+        print(add_color("=== Not enough arguments passed", R, BLD) + add_color("\n===", G, REG))
+        print(add_color("=== Closing program!", G, REG))
         return
 
     # wanted is the command or arg given
@@ -95,15 +97,15 @@ def main():
         return
     
     if wanted == "return":
-        print(add_color("=== Starting return sequence...\n", G, REG))
+        print(add_color("=== Starting return sequence...", G, REG))
         sp = open(home + "/.config/snippets/save.txt", "r")
         ret = ""
         for line in sp:
             ret += line
         pyperclip.copy(ret)
         sp.close()
-        print(add_color("=== Your old clipboard item should be in your clipboard again", G, REG))
-        print(add_color("===  Closing program!", G, REG))
+        print(add_color("=== Your old clipboard item should be in your clipboard again\n===", G, REG))
+        print(add_color("=== Closing program!", G, REG))
         return
 
     # Init Sequence. Always ends program
@@ -126,7 +128,8 @@ def main():
             os.system("touch " + home + "/.config/snippets/save.txt")
         else:
             print(add_color("=== => save.txt file exists so did nothing...", G, BLD))
-        print("\n=== Setup script finished, closing program!")
+        
+        print(add_color("===\n=== Setup script finished, closing program!", G, REG))
         return
     
     # Edit sequence. Always ends program
@@ -161,22 +164,28 @@ def main():
     # list will list snip names. else do regular op
     # List sequence. Will end program after if statement
     if wanted == "list":
-        print(add_color("=== Printing your snip list:", G, REG))
+        print(add_color("=== Printing your snip list:\n===", G, REG))
+        print(add_color("=== |-- ", G, REG) + add_color("snippets.txt", B, UND))
         for string in dict:
-            print(add_color("=== => ", G, REG) + add_color(string, B, UND))
+            print(add_color("=== |    |", G, REG))
+            print(add_color("=== |    |-- ", G, REG) + add_color(string, B, UND))
+        print(add_color("===", G, REG))
     # Report sequence. Will end program after if statement
     elif wanted == "report":
         print(add_color("=== Reporting your snips:\n===", G, REG))
+        print(add_color("=== |-- ", G, REG) + add_color("snippets.txt", B, UND))
         for string in dict:
-            print(add_color("=== => ", G, REG) + add_color(string, B, UND))
+            print(add_color("=== |    |", G, REG))
+            print(add_color("=== |    |-- ", G, REG) + add_color(string, B, UND))
+            print(add_color("=== |    |    | ", G, REG))
             for line in dict[string]:
-                print(add_color("=== => => ", G, REG) + add_color(line, B, REG), end='')
-            print(add_color("===", G, REG))
+                print(add_color("=== |    |    |-- ", G, REG) + add_color(line, B, REG), end='')
+        print(add_color("===", G, REG))
     # begin peek sequence. Will end program after if statement
     elif wanted == "peek":
         if len(sys.argv) - 1 < 2:
             print(add_color("=== Not enough args!", R, BLD))
-            print(add_color("=== Closing program!", G, REG))
+            print(add_color("===\n=== Closing program!", G, REG))
             return
         wanted = sys.argv[2]
         for i in range(3, len(sys.argv)):
@@ -185,10 +194,10 @@ def main():
         print(add_color("=== Peeking contents of ", G, REG) + add_color(wanted, B, UND) + add_color("...", G, REG))
         if not wanted in dict:
             print(add_color("=== That snip does not seem to exist... ", R, BLD))
-            print(add_color("=== Closing program!", G, REG))
+            print(add_color("===\n=== Closing program!", G, REG))
             return
         for string in dict[wanted]:
-            print(add_color("=== => ", G, REG) + add_color(string, B, REG))
+            print(add_color("=== => ", G, REG) + add_color(string, B, REG), end='')
     else:
         # Snippit to clipboard sequence
         for i in range(2, len(sys.argv)):
