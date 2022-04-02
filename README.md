@@ -2,10 +2,10 @@
 
 > By Tyler Fanuele
 
-## What is master snippits?
+## What is master snippets?
 
 This is a python program that at a basic level copys code or text to your clipboard for pasting later on. It does this\
-by storing your snippits in a user accesable text file.
+by storing your snippets in a user accesable text file.
 
 ## How to get started
 
