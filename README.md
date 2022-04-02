@@ -30,7 +30,7 @@ A snip is a refrence to a code snippit. It will be used in the options.
 
 There are two parts of a snippets.txt file; the name and contents of the snip.\
 
-The name is defined with when a string is surrounded by brackets. THe contents\
+The name is defined with when a string is surrounded by brackets. The contents\
 are defined by everything in between the brackets that define its name and the\
 next snips brackets or the end of the file.
 
