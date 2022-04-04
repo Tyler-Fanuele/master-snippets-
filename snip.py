@@ -41,7 +41,6 @@ import pyperclip
 from pathlib import Path
 import os
 from os.path import exists
-import platform
 
 # color
 G = 32

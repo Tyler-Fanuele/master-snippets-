@@ -15,7 +15,7 @@ A snip is a reference to a code snippet. It will be used in the options. save.tx
 
 ## Options
 
-| cmd | result |
+| command | result |
 |-----|--------|
 | snip.py [snip name] | Copies your snip to the clipboard if it exists. |
 | snip.py list | Lists out the names of your snips. |
