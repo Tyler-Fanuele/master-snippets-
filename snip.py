@@ -33,6 +33,7 @@
 #   add_color: This function adds color and format formatting to a string and returns it
 
 from audioop import add
+from calendar import c
 from genericpath import exists
 import re
 import sys
@@ -97,6 +98,7 @@ def main():
     home = str(Path.home())
     if len(sys.argv) - 1  < 1:
         print(add_color("=== Not enough arguments passed", R, BLD) + add_color("\n===", G, REG))
+        help()
         print(add_color("=== Closing program!", G, REG))
         return
 
@@ -193,9 +195,9 @@ def main():
         del dict[wanted]
         fp = open(home + "/.config/snippets/snippets.txt", "w")
         for string in dict:
-            fp.write("[" + string + "]")
+            fp.write("[" + string + "]" + "\n")
             for x in dict[string]:
-                fp.write("\n" + x)
+                fp.write(x)
         fp.close()
         print(add_color("=== Removed " + wanted + " from snippets.txt file\n=== Closing program...", G, REG))
         return
@@ -236,6 +238,8 @@ def main():
             for x in dict[string]:
                 fp.write(x)
         fp.close()
+        tempF = open(home + "/.config/snippets/temp.txt", "w")
+        tempF.close()
         print(add_color("=== Append sequence finished, Closing program...", G, REG))
         return
 
@@ -279,21 +283,22 @@ def main():
             print(add_color("=== => ", G, REG) + add_color(string, B, REG), end='')
     else:
         # Snippit to clipboard sequence
-        for i in range(2, len(sys.argv)):
+        for i in range(2, len(sys.argv)): # check for args, must have "snip name"
                 # print(sys.argv[i])
                 wanted += " " + sys.argv[i]
-        if not wanted in dict:
+        if not wanted in dict: # check if the snip exists
             print(add_color("=== That snip does not seem to exist... ", R, BLD))
-            print(add_color("=== Closing program!", G, REG))
+            print(add_color("=== Try edit or append!\n=== Closing program!", G, REG))
             return
         print(add_color("=== Looking for snippet: ", G, REG)+ add_color(wanted, B, UND))
-        for string in dict[wanted]:
+        for string in dict[wanted]: # copy contents of snip to the a string
             return_string += string
             sp = open(home + "/.config/snippets/save.txt", "w") # save clipboard
-            save_string = pyperclip.paste()
-            sp.write(save_string)
+            save_string = pyperclip.paste() # save old clipboard to string
+            sp.write(save_string) # save old clipboard string to save.txt
+            print(add_color("=== Old snip should be in your save.txt file...", G, REG))
             sp.close()
-            pyperclip.copy(return_string)
+            pyperclip.copy(return_string) # put snip into clipboard
         print(add_color("=== Snip should be in your clipboard", G, REG))
     print(add_color("=== Closing program!", G, REG))
 main()
