@@ -25,6 +25,8 @@ A snip is a refrence to a code snippit. It will be used in the options. save.txt
 | snip.py init | Creates the config folder and file if they are not created. |
 | snip.py return | Puts the previous clipboard buffer back into your clipboard |
 | snip.py peek [snip name] | Prints the contents of the snip if it exists. |
+| snip.py append [ editor ] [snip name] | Allows user to edit or create a snip in a text editor |
+| snip.py delete [snip name] | Allows user to delete a snip frome snippets.txt file. |
 
 ## The snippets.txt file
 

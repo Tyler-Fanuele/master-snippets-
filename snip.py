@@ -41,6 +41,7 @@ import pyperclip
 from pathlib import Path
 import os
 from os.path import exists
+import platform
 
 # color
 G = 32
@@ -66,6 +67,18 @@ def help():
     print(add_color("=== snip.py [snip name] => if the snippit exists in your file, copy to keyboard", G, REG))
     print(add_color("=== snip.py return => Puts the previous clipboard buffer back into your clipboard", G, REG))
     print(add_color("=== snip.py peek [snip name] => Prints the contents of the snip if it exists.", G, REG))
+    print(add_color("=== snip.py append [editor] [snip name] => Allows user to edit or create a snip in a text editor", G, REG))
+    print(add_color("=== snip.py delete [snip name] => Allows user to delete a snip frome snippets.txt file.", G, REG))
+
+def is_in_file(string, file_name):
+    fp = open(file_name, 'r')
+    for line in fp:
+        if line == string:
+            fp.close()
+            return True
+    fp.close()
+    return False
+
 
 def main():
     # print snippy
@@ -128,7 +141,11 @@ def main():
             os.system("touch " + home + "/.config/snippets/save.txt")
         else:
             print(add_color("=== => save.txt file exists so did nothing...", G, BLD))
-        
+        if not exists(home + "/.config/snippets/temp.txt"):
+            print(add_color("=== => Making file: " + home + "/.config/snippets/temp.txt", G, REG))
+            os.system("touch " + home + "/.config/snippets/temp.txt")
+        else:
+            print(add_color("=== => temp.txt file exists so did nothing...", G, BLD))
         print(add_color("===\n=== Setup script finished, closing program!", G, REG))
         return
     
@@ -159,6 +176,69 @@ def main():
             dict[current].append(line)
     return_string = ""
     fp.close()
+
+    # delete sequence.
+    if wanted == "delete" or wanted == "del":
+        if len(sys.argv) - 1 < 2:
+            print(add_color("=== Not enough args!", R, BLD))
+            print(add_color("===\n=== Closing program!", G, REG))
+            return
+        wanted = sys.argv[2]
+        for x in range(3, len(sys.argv)):
+            wanted += " " + sys.argv[x]
+        if wanted not in dict:
+            print(add_color("=== Snip: " + wanted + " doesen't exists!", R, BLD))
+            print(add_color("===\n=== Closing program!", G, REG))
+            return
+        print(add_color("===\n=== Attempting to delete " + wanted + " from snippets file...", G, REG))
+        del dict[wanted]
+        fp = open(home + "/.config/snippets/snippets.txt", "w")
+        for string in dict:
+            fp.write("[" + string + "]")
+            for x in dict[string]:
+                fp.write("\n" + x)
+        fp.close()
+        print(add_color("=== Removed " + wanted + " from snippets.txt file\n=== Closing program...", G, REG))
+        return
+
+    # append sequence.
+    if wanted == "append":
+        if len(sys.argv) - 1 < 3: # check for right number of args. Must have "append" "editor" "snip name"
+            print(add_color("=== Not enough args!", R, BLD))
+            print(add_color("===\n=== Closing program!", G, REG))
+            return
+        editor = sys.argv[2]    # get editor from args
+        if not exists(home + "/.config/snippets/temp.txt"): # check if temp.txt buffer file exists
+            print(add_color("=== temp.txt does not exist!\n=== Run snip.py init!", R, BLD))
+            print(add_color("=== Closing program...", G, REG))
+            return
+        wanted = sys.argv[3]    # gets full snip name from rest of arg list
+        for x in range(4, len(sys.argv)):
+            wanted += " " + sys.argv[x]
+        if wanted in dict:  # if snip already exists copy it into temp buffer file for append
+            tempF = open(home + "/.config/snippets/temp.txt", "w")
+            for string in dict[wanted]:
+                tempF.write(string)
+            tempF.close()
+            dict[wanted] = ""
+        else:   # if snip does not exist allocate space for it so it can be created
+            dict[wanted].append("")
+        print(add_color("=== Attempting to open " + editor + "\n===", G, REG))
+        os.system(editor + " " + home + "/.config/snippets/temp.txt") # open temp buffer in user defined editor
+        tempF = open(home + "/.config/snippets/temp.txt", "r") # read in changed snip contents
+        insert = ""
+        for x in tempF:
+            insert += x
+        tempF.close()
+        dict[wanted] = insert # add the new snip contents to the dict
+        fp = open(home + "/.config/snippets/snippets.txt", "w") # reprint the file by copying dict in the original format
+        for string in dict:
+            fp.write("[" + string + "]" + "\n")
+            for x in dict[string]:
+                fp.write(x)
+        fp.close()
+        print(add_color("=== Append sequence finished, Closing program...", G, REG))
+        return
 
     # looks for 'args'. 
     # list will list snip names. else do regular op
@@ -217,5 +297,4 @@ def main():
             pyperclip.copy(return_string)
         print(add_color("=== Snip should be in your clipboard", G, REG))
     print(add_color("=== Closing program!", G, REG))
-    #fp.close()
 main()
