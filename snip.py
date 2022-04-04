@@ -64,7 +64,7 @@ def help():
     print(add_color("=== snip.py report => reports all of the snip", G, REG))
     print(add_color("=== snip.py init => used at the start, initializes snip files/dir", G, REG))
     print(add_color("=== snip.py edit [editor] => allows editing of the snippits.txt file", G, REG))
-    print(add_color("=== snip.py [snip name] => if the snippit exists in your file, copy to keyboard", G, REG))
+    print(add_color("=== snip.py get [snip name] => if the snippit exists in your file, copy to keyboard", G, REG))
     print(add_color("=== snip.py return => Puts the previous clipboard buffer back into your clipboard", G, REG))
     print(add_color("=== snip.py peek [snip name] => Prints the contents of the snip if it exists.", G, REG))
     print(add_color("=== snip.py append [editor] [snip name] => Allows user to edit or create a snip in a text editor", G, REG))
@@ -106,22 +106,6 @@ def main():
     wanted = sys.argv[1]
     # this is the place our arg is
 
-    if wanted == "help" or wanted == "h":
-        help()
-        return
-    
-    if wanted == "return":
-        print(add_color("=== Starting return sequence...", G, REG))
-        sp = open(home + "/.config/snippets/save.txt", "r")
-        ret = ""
-        for line in sp:
-            ret += line
-        pyperclip.copy(ret)
-        sp.close()
-        print(add_color("=== Your old clipboard item should be in your clipboard again\n===", G, REG))
-        print(add_color("=== Closing program!", G, REG))
-        return
-
     # Init Sequence. Always ends program
     if wanted == "init":
         # if snippits dir exists
@@ -146,8 +130,24 @@ def main():
             print(add_color("=== => Making file: " + home + "/.config/snippets/temp.txt", G, REG))
             os.system("touch " + home + "/.config/snippets/temp.txt")
         else:
-            print(add_color("=== => temp.txt file exists so did nothing...", G, BLD))
+            print(add_color("=== => config.txt file exists so did nothing...", G, BLD))
         print(add_color("===\n=== Setup script finished, closing program!", G, REG))
+        return
+
+    if wanted == "help" or wanted == "h":
+        help()
+        return
+
+    if wanted == "return":
+        print(add_color("=== Starting return sequence...", G, REG))
+        sp = open(home + "/.config/snippets/save.txt", "r")
+        ret = ""
+        for line in sp:
+            ret += line
+        pyperclip.copy(ret)
+        sp.close()
+        print(add_color("=== Your old clipboard item should be in your clipboard again\n===", G, REG))
+        print(add_color("=== Closing program!", G, REG))
         return
     
     # Edit sequence. Always ends program
@@ -156,7 +156,7 @@ def main():
             print(add_color("=== Not enough args!", R, BLD))
             return
         if not exists(home + "/.config/snippets") or not exists(home + "/.config/snippets/snippets.txt"):
-            print(add_color("=== Snippit dir or snippet.txst file does not exist.\nRun snippet init", R, BLD))
+            print(add_color("=== Snippit dir or snippet.txt file does not exist.\nRun snippet init", R, BLD))
             return
         print(add_color("=== Attempting to open " + sys.argv[2] + "...\n", G, BLD))
         os.system(sys.argv[2] + " " + home + "/.config/snippets/snippets.txt")
@@ -281,13 +281,18 @@ def main():
             return
         for string in dict[wanted]:
             print(add_color("=== => ", G, REG) + add_color(string, B, REG), end='')
-    else:
+    elif wanted == "get":
         # Snippit to clipboard sequence
-        for i in range(2, len(sys.argv)): # check for args, must have "snip name"
-                # print(sys.argv[i])
-                wanted += " " + sys.argv[i]
+        wanted = sys.argv[2]
+        for i in range(3, len(sys.argv)):
+            print(sys.argv[i])
+            wanted += " " + sys.argv[i]
+        if not exists(home + "/.config/snippets/snippets.txt"):
+            print(add_color("=== snippets.txt does not seem to exist... ", R, BLD))
+            print(add_color("=== Run snip init !\n=== Closing program!", G, REG))
+            return
         if not wanted in dict: # check if the snip exists
-            print(add_color("=== That snip does not seem to exist... ", R, BLD))
+            print(add_color("=== " + wanted + " snip does not seem to exist... ", R, BLD))
             print(add_color("=== Try edit or append!\n=== Closing program!", G, REG))
             return
         print(add_color("=== Looking for snippet: ", G, REG)+ add_color(wanted, B, UND))
@@ -296,9 +301,9 @@ def main():
             sp = open(home + "/.config/snippets/save.txt", "w") # save clipboard
             save_string = pyperclip.paste() # save old clipboard to string
             sp.write(save_string) # save old clipboard string to save.txt
-            print(add_color("=== Old snip should be in your save.txt file...", G, REG))
             sp.close()
             pyperclip.copy(return_string) # put snip into clipboard
+        print(add_color("=== Old snip should be in your save.txt file...", G, REG))
         print(add_color("=== Snip should be in your clipboard", G, REG))
     print(add_color("=== Closing program!", G, REG))
 main()
