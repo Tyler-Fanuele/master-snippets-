@@ -27,6 +27,7 @@ A snip is a reference to a code snippet. It will be used in the options. save.tx
 | snip.py peek [snip name] | Prints the contents of the snip if it exists. |
 | snip.py append [ editor ] [snip name] | Allows user to edit or create a snip in a text editor |
 | snip.py delete [snip name] | Allows user to delete a snip from snippets.txt file. |
+| snip.py search [snip name] | Allows user to search alike snips |
 
 ## The snippets.txt file
 

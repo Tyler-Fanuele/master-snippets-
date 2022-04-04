@@ -51,6 +51,7 @@ B = 34
 BLD = 1
 UND = 4
 REG = 0
+# home directory
 home = str(Path.home())
 
 
@@ -335,6 +336,7 @@ def snip_help(wanted, dict):
         "=== snip.py append [editor] [snip name] => Allows user to edit or create a snip in a text editor", G, REG))
     print(add_color(
         "=== snip.py delete [snip name] => Allows user to delete a snip from snippets.txt file.", G, REG))
+    print(add_color("=== snip.py search [snip name] => Allows user to search alike snips", G, REG))
 
 def is_in_file(string, file_name):
     fp = open(file_name, 'r')
