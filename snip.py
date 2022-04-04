@@ -62,13 +62,13 @@ def help():
     print(add_color("=== snip.py help => outputs this help menu", G, REG))
     print(add_color("=== snip.py list => lists your code snip names", G, REG))
     print(add_color("=== snip.py report => reports all of the snip", G, REG))
-    print(add_color("=== snip.py init => used at the start, initilizes snip files/dir", G, REG))
+    print(add_color("=== snip.py init => used at the start, initializes snip files/dir", G, REG))
     print(add_color("=== snip.py edit [editor] => allows editing of the snippits.txt file", G, REG))
     print(add_color("=== snip.py [snip name] => if the snippit exists in your file, copy to keyboard", G, REG))
     print(add_color("=== snip.py return => Puts the previous clipboard buffer back into your clipboard", G, REG))
     print(add_color("=== snip.py peek [snip name] => Prints the contents of the snip if it exists.", G, REG))
     print(add_color("=== snip.py append [editor] [snip name] => Allows user to edit or create a snip in a text editor", G, REG))
-    print(add_color("=== snip.py delete [snip name] => Allows user to delete a snip frome snippets.txt file.", G, REG))
+    print(add_color("=== snip.py delete [snip name] => Allows user to delete a snip from snippets.txt file.", G, REG))
 
 def is_in_file(string, file_name):
     fp = open(file_name, 'r')
