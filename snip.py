@@ -204,7 +204,9 @@ class Screen(object):
         self.window.refresh()
 
 def snip_visual(wanted, dict):
+    print(add_color("===\n=== Entering visual mode, say hi to snippy for me!", G, REG))
     wrapper(visual, wanted, dict)
+    print(add_color("===\n=== Exiting visual mode.",G, REG))
 
 def visual(stdscr, wanted, dict):
 
@@ -285,7 +287,7 @@ def populate_snips():
     top_pattern = r'[\[\]\n]'
     # fill dictionary with lines. [] assigns snip name
     for line in fp:
-        if re.match("[\[][A-Z0-9a-z ]*[\]]", line):
+        if re.match("[\[][A-Z0-9a-z +.]*[\]]", line):
             current = re.sub(top_pattern, '', line)
         else:
             dict[current].append(line)
