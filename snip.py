@@ -32,6 +32,7 @@
 #
 #   add_color: This function adds color and format formatting to a string and returns it
 
+import curses.textpad
 from audioop import add
 from calendar import c
 import enum
@@ -57,89 +58,100 @@ REG = 0
 # home directory
 home = str(Path.home())
 
-import curses.textpad
+
+snippy = "             ____\n" + "            / . .\\\n" + "  snippy    \  ---<\n" + \
+    "             \  /\n" + "   __________/ /\n"+"-=:___________/"
+snippy_formatted = "===              ____\n" + "===             / . .\\\n" + \
+    "===   snippy    \  ---<\n" + "===              \  /\n" + \
+    "===    __________/ /\n"+"=== -=:___________/"
 
 
 class Screen(object):
     UP = -1
     DOWN = 1
 
-    def __init__(self, items, title):
+    def __init__(self, display, items, title, edge):
         """ Initialize the screen window
         This Class was taken and modified from 
         https://github.com/mingrammer/python-curses-scroll-example/blob/master/tui.py
         """
-        self.window = None
+        self.window = None # window object for the screen
 
-        self.width = 0
-        self.height = 0
+        self.width = 0 # screen width
+        self.height = 0 # screen height
 
-        self.title_offset = len(title) + 1
-        self.title = title
+        self.title_offset = len(title) + 1 # Added by me, The title offset is the amount of space the title list
+                                           # will take up
+        self.title = title # Added by me, the list of strings that will be sequencially printed to the screen
 
-        self.option = "get"
+        self.option = "get" # Added by me, the current option for the program. Init at "get"
 
-        self.init_curses()
+        self.edge = edge # Added by me, the edge string to be printed at the edge of each list item
 
-        self.items = items
+        self.init_curses() # Inits the curses objects
 
-        self.max_lines = curses.LINES - self.title_offset
-        self.top = 0
-        self.bottom = len(self.items)
-        self.current = 0
-        self.page = self.bottom // self.max_lines
+        self.display = display
+
+        self.items = items # the list of items, in this case our snips
+
+        self.max_lines = curses.LINES - self.title_offset # This stores the max lines printable, goten when visual starts
+        self.top = 0 # Keeps the top item index
+        self.bottom = len(self.items) # keeps the last item index
+        self.current = 0 # keeps the current item index
+        self.page = self.bottom // self.max_lines # figures our how to allocate pages
 
     def init_curses(self):
         """Setup the curses"""
-        self.window = curses.initscr()
-        self.window.keypad(True)
+        self.window = curses.initscr() # inits the curses object
+        self.window.keypad(True) # allows for keypad reading
 
-        curses.noecho()
+        curses.noecho() 
         curses.cbreak()
 
         curses.start_color()
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
 
-        self.current = curses.color_pair(2)
+        self.current = curses.color_pair(2) # sets color pair
 
-        self.height, self.width = self.window.getmaxyx()
+        self.height, self.width = self.window.getmaxyx() # sets max width
 
     def run(self):
         """Continue running the TUI until get interrupted"""
         try:
-            self.input_stream()
+            self.input_stream() # gets input strings
         except KeyboardInterrupt:
             pass
         finally:
-            curses.endwin()
+            curses.endwin() # ends program
 
     def input_stream(self):
         """Waiting an input and run a proper method according to type of input"""
-        while True:
-            self.display()
+        while True: # runs until input is recieved
+            self.display(self)
 
-            ch = self.window.getch()
-            if ch == curses.KEY_UP:
+            ch = self.window.getch() # gets the key pressed as a char
+            if ch == curses.KEY_UP: # looks for up keypress, will call scroll function with up
                 self.scroll(self.UP)
-            elif ch == curses.KEY_DOWN:
+            elif ch == curses.KEY_DOWN: # looks for down keypress, will call scroll function with down
                 self.scroll(self.DOWN)
-            elif ch == curses.KEY_LEFT:
+            elif ch == curses.KEY_LEFT: # looks for left keypress, will call page function with up
                 self.paging(self.UP)
-            elif ch == curses.KEY_RIGHT:
+            elif ch == curses.KEY_RIGHT: # looks for right keypress, will call page function with down
                 self.paging(self.DOWN)
-            elif ch == ord('q'):
+            elif ch == ord('q'): # if q then quit the program
                 break
-            elif ch == curses.KEY_ENTER or ch == 10 or ch == 13:
-                if self.option == "get":
+            elif ch == curses.KEY_ENTER or ch == 10 or ch == 13: # if the enter key is pressed
+                # first check what option is currently selected
+                if self.option == "get": # if it is get, add the current snip to your clipboard
                     string = ""
                     for i in self.items[self.current][1]:
                         string += i
                     pyperclip.copy(string)
-            elif ch == ord('g'):
+            elif ch == ord('g'): # if g is pressed, set option to get
                 self.option = "get"
 
-
+    #scrole in the given direction
     def scroll(self, direction):
         """Scrolling the window when pressing up/down arrow keys"""
         # next cursor position after scrolling
@@ -187,58 +199,97 @@ class Screen(object):
             self.top += self.max_lines
             return
 
-    def display(self):
-        """Display the items on window"""
-        self.window.erase()
-        for title_index, string in enumerate(self.title):
-            self.window.addstr(title_index, 0, string, curses.color_pair(1))
-        for idx, item in enumerate(self.items[self.top:self.top + self.max_lines]):
+    """" def display(self):
+        """"Display the items on window""""
+        self.window.erase() # erase the window for future writing
+        for title_index, string in enumerate(self.title): # print the contents of the snip strings given, in order
+            self.window.addstr(title_index, 0, self.edge + string, curses.color_pair(1))
+        for x, s in enumerate(self.items[self.current][1]): # print the contents of the title strings given, in order
+            self.window.addstr(x + 5 + self.title_offset, 50, s, curses.color_pair(1))
+        for idx, item in enumerate(self.items[self.top:self.top + self.max_lines]): # start loop on the list of snips
             # Highlight the current cursor line
-            if idx == self.current:
-                self.window.addstr(idx + self.title_offset, 0, item[0].ljust(20) + "==>", curses.color_pair(2))
-                for index, line in enumerate(item[1]):
-                    self.window.addstr(index + 5, 50, line, curses.color_pair(1))
+            if idx == self.current: 
+                self.window.addstr(idx + self.title_offset, 0,
+                                   self.edge + item[0].ljust(47) + "==>", curses.color_pair(2)) # print the current index item in
+            else:                                                                               # different color
+                self.window.addstr(idx + self.title_offset,
+                                   0, self.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
+        self.window.refresh()  # refresh the page"""
 
-            else:
-                self.window.addstr(idx + self.title_offset, 0, item[0], curses.color_pair(1))
-        self.window.refresh()
 
+def snip_display(Screen):
+    """Display the items on window"""
+    Screen.window.erase() # erase the window for future writing
+    for title_index, string in enumerate(Screen.title): # print the contents of the snip strings given, in order
+        Screen.window.addstr(title_index, 0, Screen.edge + string, curses.color_pair(1))
+    for x, s in enumerate(Screen.items[Screen.current][1]): # print the contents of the title strings given, in order
+        Screen.window.addstr(x + 5 + Screen.title_offset, 50, s, curses.color_pair(1))
+    for idx, item in enumerate(Screen.items[Screen.top:Screen.top + Screen.max_lines]): # start loop on the list of snips
+        # Highlight the current cursor line
+        if idx == Screen.current: 
+            Screen.window.addstr(idx + Screen.title_offset, 0,
+                               Screen.edge + item[0].ljust(47) + "==>", curses.color_pair(2)) # print the current index item in
+        else:                                                                               # different color
+            Screen.window.addstr(idx + Screen.title_offset,
+                               0, Screen.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
+    Screen.window.refresh()  # refresh the page
+
+def snip_display(Screen):
+    """Display the items on window"""
+    Screen.window.erase() # erase the window for future writing
+    for title_index, string in enumerate(Screen.title): # print the contents of the title strings given, in order
+        Screen.window.addstr(title_index, 0, Screen.edge + string, curses.color_pair(1))
+    for x, s in enumerate(Screen.items[Screen.current][1]): 
+        Screen.window.addstr(x + 5 + Screen.title_offset, 50, s, curses.color_pair(1))# print the contents of the snip strings given, in order
+    for idx, item in enumerate(Screen.items[Screen.top:Screen.top + Screen.max_lines]): # start loop on the list of snips
+        # Highlight the current cursor line
+        if idx == Screen.current: 
+            Screen.window.addstr(idx + Screen.title_offset, 0,
+                               Screen.edge + item[0].ljust(42) + "==>", curses.color_pair(2)) # print the current index item in
+        else:                                                                               # different color
+            Screen.window.addstr(idx + Screen.title_offset,
+                               0, Screen.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
+    Screen.window.refresh()  # refresh the page
+# accessor for the main switch statement
 def snip_visual(wanted, dict):
     print(add_color("===\n=== Entering visual mode, say hi to snippy for me!", G, REG))
     wrapper(visual, wanted, dict)
-    print(add_color("===\n=== Exiting visual mode.",G, REG))
+    print(add_color("===\n=== Exiting visual mode.", G, REG))
 
+# internal visual function
 def visual(stdscr, wanted, dict):
 
-    l = list(dict.items())
-    screen = Screen(l, ["Master Snippets Visual"
-                       ,"Name                                              Contents",""])
+    l = list(dict.items()) # turn the dictionary into a list so we can access by iterator
+    # init a screen object with our list of snips, our list of strings for the title and the edge string
+    screen = Screen(snip_display, l, ["             ____\n", "            / . .\\\n", "  snippy    \  ---<\n",
+    "             \  /\n", "   __________/ /\n","-=:___________/","Master Snippets Visual",
+                    "Name                                                 Contents", ""], "=== ")
     screen.run()
-        
+
 
 def snip_init(wanted, dict):
     # if snippits dir exists
     print(add_color("=== Starting start up script", G, REG))
-    if not exists(home + "/.config/snippets"):
+    if not exists(home + "/.config/snippets"): # init the snippets folder
         print(add_color("=== => Making dir: " +
               home + "/.config/snippets", G, REG))
         os.system("mkdir " + home + "/.config/snippets")
     else:
         print(add_color("=== => snippets directory exists so did nothing...", G, BLD))
     # if snippits.txt exists
-    if not exists(home + "/.config/snippets/snippets.txt"):
+    if not exists(home + "/.config/snippets/snippets.txt"): # init the snippets.txt file
         print(add_color("=== => Making file: " + home +
               "/.config/snippets/snippets.txt", G, REG))
         os.system("touch " + home + "/.config/snippets/snippets.txt")
     else:
         print(add_color("=== => snippets.txt file exists so did nothing...", G, BLD))
-    if not exists(home + "/.config/snippets/save.txt"):
+    if not exists(home + "/.config/snippets/save.txt"): # init the save.txt file
         print(add_color("=== => Making file: " + home +
               "/.config/snippets/save.txt", G, REG))
         os.system("touch " + home + "/.config/snippets/save.txt")
     else:
         print(add_color("=== => save.txt file exists so did nothing...", G, BLD))
-    if not exists(home + "/.config/snippets/temp.txt"):
+    if not exists(home + "/.config/snippets/temp.txt"): # init the temp.txt file
         print(add_color("=== => Making file: " + home +
               "/.config/snippets/temp.txt", G, REG))
         os.system("touch " + home + "/.config/snippets/temp.txt")
@@ -249,14 +300,14 @@ def snip_init(wanted, dict):
 
 
 def add_color(wString, color, form):
-    temp1 = "\033[" + str(form) + ";" + str(color) + "m" + wString + "\033[0m"
+    temp1 = "\033[" + str(form) + ";" + str(color) + "m" + wString + "\033[0m" # add color to the given string
     return temp1
 
 
 def snip_return(wanted, dict):
     print(add_color("=== Starting return sequence...", G, REG))
     sp = open(home + "/.config/snippets/save.txt", "r")
-    ret = ""
+    ret = "" # copy the contents of the save.txt file to your clipboard
     for line in sp:
         ret += line
     pyperclip.copy(ret)
@@ -270,14 +321,15 @@ def snip_edit(wanted, dict):
     if len(sys.argv) - 1 < 2:
         print(add_color("=== Not enough args!", R, BLD))
         return
-    if not exists(home + "/.config/snippets") or not exists(home + "/.config/snippets/snippets.txt"):
-        print(add_color(
+    if not exists(home + "/.config/snippets") or not exists(home + "/.config/snippets/snippets.txt"): # check if snippets.txt exists
+        print(add_color( 
             "=== Snippit dir or snippet.txt file does not exist.\nRun snippet init", R, BLD))
         return
     print(add_color("=== Attempting to open " +
           sys.argv[2] + "...\n", G, BLD))
     os.system(sys.argv[2] + " " + home + "/.config/snippets/snippets.txt")
     return
+
 
 def populate_snips():
     dict = defaultdict(list)
@@ -293,6 +345,7 @@ def populate_snips():
             dict[current].append(line)
     fp.close()
     return dict
+
 
 def snip_search(wanted, dict):
     wanted = sys.argv[2]
@@ -476,6 +529,8 @@ def return_like_items(dict, string):
     return return_dict
 
 # help function
+
+
 def snip_help(wanted, dict):
     print(add_color("=== snip.py help:", G, REG))
     print(add_color("=== snip.py help => outputs this help menu", G, REG))
@@ -495,7 +550,9 @@ def snip_help(wanted, dict):
         "=== snip.py append [editor] [snip name] => Allows user to edit or create a snip in a text editor", G, REG))
     print(add_color(
         "=== snip.py delete [snip name] => Allows user to delete a snip from snippets.txt file.", G, REG))
-    print(add_color("=== snip.py search [snip name] => Allows user to search alike snips", G, REG))
+    print(add_color(
+        "=== snip.py search [snip name] => Allows user to search alike snips", G, REG))
+
 
 def is_in_file(string, file_name):
     fp = open(file_name, 'r')
@@ -509,13 +566,7 @@ def is_in_file(string, file_name):
 
 def main():
     # print snippy
-    print(add_color(
-          "===               ____\n" +
-          "===              / . .\\\n" +
-          "===    snippy    \  ---<\n" +
-          "===               \  /\n"
-          "===     __________/ /\n"
-          "===  -=:___________/\n===", G, REG))
+    print(add_color(snippy_formatted, G, REG))
     print(add_color("=== Code Snippets program\n=== ", G, REG) +
           add_color("Copyright 2022, Tyler Fanuele.", G, UND))
     print(add_color("===\n=== Command issued by user: \n=== ", G, REG), end='')
@@ -533,25 +584,27 @@ def main():
     dict = populate_snips()
     # dictonary of options
     options = {
-        "init" : snip_init,
-        "help" : snip_help,
-        "return" : snip_return,
-        "edit" : snip_edit,
-        "search" : snip_search,
-        "delete" : snip_delete,
-        "append" : snip_append,
-        "list" : snip_list,
-        "peek" : snip_peek,
-        "report" : snip_report,
-        "get" : snip_get,
-        str(sys.argv[0]) : snip_visual
+        "init": snip_init,
+        "help": snip_help,
+        "return": snip_return,
+        "edit": snip_edit,
+        "search": snip_search,
+        "delete": snip_delete,
+        "append": snip_append,
+        "list": snip_list,
+        "peek": snip_peek,
+        "report": snip_report,
+        "get": snip_get,
+        str(sys.argv[0]): snip_visual
     }
     # check if the option is valid
     if not wanted in options:
-        print(add_color("=== Item \"" + wanted +"\" is not an option!", R, BLD))
+        print(add_color("=== Item \"" + wanted + "\" is not an option!", R, BLD))
     else:
         # run associated option command
         options[wanted](wanted, dict)
 
     print(add_color("=== Closing program!", G, REG))
+
+
 main()
