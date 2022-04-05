@@ -28,12 +28,13 @@ A snip is a reference to a code snippet. It will be used in the options. save.tx
 | snip.py append [ editor ] [snip name] | Allows user to edit or create a snip in a text editor |
 | snip.py delete [snip name] | Allows user to delete a snip from snippets.txt file. |
 | snip.py search [snip name] | Allows user to search alike snips |
+| snip.py | Starts visual mode |
 
 ## The snippets.txt file
 
 ### How To
 
-There are two parts of a snippets.txt file; the name and contents of the snip.\
+There are two parts of a snippets.txt file; the name and contents of the snip.
 
 The name is defined with when a string is surrounded by brackets. The contents\
 are defined by everything in between the brackets that define its name and the\
