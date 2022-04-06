@@ -148,8 +148,13 @@ class Screen(object):
                     for i in self.items[self.current][1]:
                         string += i
                     pyperclip.copy(string)
+                elif self.option == "delete":
+                    del self.items[self.current]
+                    self.bottom = len(self.items)
             elif ch == ord('g'): # if g is pressed, set option to get
                 self.option = "get"
+            elif ch == ord('d'):
+                self.option = "delete"
 
     #scrole in the given direction
     def scroll(self, direction):
@@ -199,41 +204,6 @@ class Screen(object):
             self.top += self.max_lines
             return
 
-    """" def display(self):
-        """"Display the items on window""""
-        self.window.erase() # erase the window for future writing
-        for title_index, string in enumerate(self.title): # print the contents of the snip strings given, in order
-            self.window.addstr(title_index, 0, self.edge + string, curses.color_pair(1))
-        for x, s in enumerate(self.items[self.current][1]): # print the contents of the title strings given, in order
-            self.window.addstr(x + 5 + self.title_offset, 50, s, curses.color_pair(1))
-        for idx, item in enumerate(self.items[self.top:self.top + self.max_lines]): # start loop on the list of snips
-            # Highlight the current cursor line
-            if idx == self.current: 
-                self.window.addstr(idx + self.title_offset, 0,
-                                   self.edge + item[0].ljust(47) + "==>", curses.color_pair(2)) # print the current index item in
-            else:                                                                               # different color
-                self.window.addstr(idx + self.title_offset,
-                                   0, self.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
-        self.window.refresh()  # refresh the page"""
-
-
-def snip_display(Screen):
-    """Display the items on window"""
-    Screen.window.erase() # erase the window for future writing
-    for title_index, string in enumerate(Screen.title): # print the contents of the snip strings given, in order
-        Screen.window.addstr(title_index, 0, Screen.edge + string, curses.color_pair(1))
-    for x, s in enumerate(Screen.items[Screen.current][1]): # print the contents of the title strings given, in order
-        Screen.window.addstr(x + 5 + Screen.title_offset, 50, s, curses.color_pair(1))
-    for idx, item in enumerate(Screen.items[Screen.top:Screen.top + Screen.max_lines]): # start loop on the list of snips
-        # Highlight the current cursor line
-        if idx == Screen.current: 
-            Screen.window.addstr(idx + Screen.title_offset, 0,
-                               Screen.edge + item[0].ljust(47) + "==>", curses.color_pair(2)) # print the current index item in
-        else:                                                                               # different color
-            Screen.window.addstr(idx + Screen.title_offset,
-                               0, Screen.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
-    Screen.window.refresh()  # refresh the page
-
 def snip_display(Screen):
     """Display the items on window"""
     Screen.window.erase() # erase the window for future writing
@@ -248,8 +218,9 @@ def snip_display(Screen):
                                Screen.edge + item[0].ljust(42) + "==>", curses.color_pair(2)) # print the current index item in
         else:                                                                               # different color
             Screen.window.addstr(idx + Screen.title_offset,
-                               0, Screen.edge + item[0].ljust(47), curses.color_pair(1))      # print the rest
+                               0, Screen.edge + item[0].ljust(42), curses.color_pair(1))      # print the rest
     Screen.window.refresh()  # refresh the page
+
 # accessor for the main switch statement
 def snip_visual(wanted, dict):
     print(add_color("===\n=== Entering visual mode, say hi to snippy for me!", G, REG))
