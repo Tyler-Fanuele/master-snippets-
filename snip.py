@@ -495,7 +495,8 @@ def snip_get(wanted, dict):
 def return_like_items(dict, string):
     return_dict = defaultdict(list)
     for key in dict:
-        if re.match(r"[" + key + "]", string):
+        #if re.match(r"[" + key + "]", string):
+        if re.search(r"\W*(" + string + ")\W*", key, re.IGNORECASE):
             return_dict[key] = dict[key]
     return return_dict
 
